@@ -1,0 +1,167 @@
+/* =============================================
+   PROJECT YOLK ALPHA: MOBILE.CSS
+   Responsive overrides for specific components
+   and layout refinement for small screens.
+   ============================================= */
+
+@media (max-width: 768px) {
+
+    /* --- Typography Refinements --- */
+    .hero-title {
+        font-size: clamp(2.8rem, 10vw, 4.5rem);
+        letter-spacing: 1px;
+        line-height: 0.9;
+        margin-bottom: 8px;
+    }
+
+    .hero-sub {
+        font-size: 0.85rem;
+        letter-spacing: 4px;
+        margin-bottom: 24px;
+    }
+
+    .hero-thesis {
+        font-size: 0.95rem;
+        padding: 24px 28px;
+        margin-bottom: 48px;
+        line-height: 1.7;
+    }
+
+    .hero-thesis::before {
+        font-size: 3rem;
+        top: -10px;
+        left: 14px;
+    }
+
+    .hero-thesis::after {
+        font-size: 3rem;
+        bottom: -24px;
+        right: 14px;
+    }
+
+    .sector-title {
+        font-size: 1.75rem;
+        letter-spacing: -0.5px;
+    }
+
+    .sector-subtitle {
+        font-size: 0.88rem;
+        margin-bottom: 30px;
+    }
+
+    /* --- Layout Refinements --- */
+    section {
+        padding: 40px 0;
+    }
+
+    .container {
+        padding: 0 20px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        gap: 16px;
+    }
+
+    /* --- Component Fixes --- */
+    .metric-card {
+        padding: 20px 18px;
+    }
+
+    .metric-value {
+        font-size: 1.8rem;
+    }
+
+    .roadmap-card {
+        padding: 20px 18px;
+    }
+
+    .roadmap-card h3 {
+        font-size: 1rem;
+    }
+
+    .math-block {
+        font-size: 0.68rem;
+        padding: 10px 12px;
+    }
+
+    .impact {
+        font-size: 0.72rem;
+    }
+
+    /* --- Simulator Adjustments --- */
+    .sim-panel {
+        padding: 20px;
+    }
+
+    .output-grid {
+        gap: 10px;
+    }
+
+    .output-card {
+        padding: 14px 12px;
+    }
+
+    .output-value {
+        font-size: 1.4rem;
+    }
+
+    /* --- Floating Nav Mobile --- */
+    .floating-nav {
+        bottom: 15px;
+        left: 10px;
+        right: 10px;
+        gap: 8px;
+    }
+
+    .nav-btn {
+        font-size: 0.6rem;
+        padding: 10px 12px;
+        letter-spacing: 1.5px;
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .ticker-wrap {
+        padding: 8px 0;
+    }
+
+    .ticker-item {
+        margin-right: 30px;
+        font-size: 0.68rem;
+    }
+
+    .hero-title {
+        font-size: 3.2rem;
+    }
+
+    .hero-thesis {
+        padding: 20px 24px;
+    }
+
+    .hero-thesis::before,
+    .hero-thesis::after {
+        font-size: 2.5rem;
+    }
+
+    .table-wrap {
+        border-radius: var(--radius-sm);
+    }
+
+    table {
+        font-size: 0.7rem;
+    }
+
+    thead th,
+    tbody td {
+        padding: 8px 6px;
+    }
+
+    .pnl-total td {
+        font-size: 0.82rem;
+    }
+}
