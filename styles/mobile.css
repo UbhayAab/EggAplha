@@ -1,178 +1,191 @@
 /* =============================================
    PROJECT YOLK ALPHA: MOBILE.CSS
-   Responsive overrides for specific components
-   and layout refinement for small screens.
+   Responsive overrides for phone screens.
+   Loaded LAST to win the cascade.
    ============================================= */
 
 @media (max-width: 768px) {
 
     /* --- Typography Refinements --- */
     .hero-title {
-        font-size: clamp(2.8rem, 10vw, 4.5rem);
-        letter-spacing: 1px;
-        line-height: 0.9;
-        margin-bottom: 8px;
+        font-size: clamp(2.8rem, 10vw, 4.5rem) !important;
+        letter-spacing: 1px !important;
+        line-height: 0.9 !important;
+        margin-bottom: 8px !important;
     }
 
     .hero-sub {
-        font-size: 0.85rem;
-        letter-spacing: 4px;
-        margin-bottom: 24px;
+        font-size: 0.85rem !important;
+        letter-spacing: 4px !important;
+        margin-bottom: 24px !important;
     }
 
     .hero-thesis {
-        font-size: 0.95rem;
-        padding: 24px 28px;
-        margin-bottom: 48px;
-        line-height: 1.7;
+        font-size: 0.95rem !important;
+        padding: 24px 28px !important;
+        margin-bottom: 48px !important;
+        line-height: 1.7 !important;
     }
 
     .hero-thesis::before {
-        font-size: 3rem;
-        top: -10px;
-        left: 14px;
+        font-size: 3rem !important;
+        top: -10px !important;
+        left: 14px !important;
     }
 
     .hero-thesis::after {
-        font-size: 3rem;
-        bottom: -24px;
-        right: 14px;
+        font-size: 3rem !important;
+        bottom: -24px !important;
+        right: 14px !important;
     }
 
     .sector-title {
-        font-size: 1.75rem;
-        letter-spacing: -0.5px;
+        font-size: 1.75rem !important;
+        letter-spacing: -0.5px !important;
     }
 
     .sector-subtitle {
-        font-size: 0.88rem;
-        margin-bottom: 30px;
+        font-size: 0.88rem !important;
+        margin-bottom: 30px !important;
     }
 
     /* --- Layout Refinements --- */
     section {
-        padding: 40px 0;
+        padding: 40px 0 !important;
     }
 
     .container {
-        padding: 0 20px;
+        padding: 0 20px !important;
     }
 
     .grid-2,
     .grid-3,
     .grid-4 {
-        gap: 16px;
+        gap: 16px !important;
     }
 
     /* --- Component Fixes --- */
     .metric-card {
-        padding: 20px 18px;
+        padding: 20px 18px !important;
     }
 
     .metric-value {
-        font-size: 1.8rem;
+        font-size: 1.8rem !important;
     }
 
     .roadmap-card {
-        padding: 20px 18px;
+        padding: 20px 18px !important;
     }
 
     .roadmap-card h3 {
-        font-size: 1rem;
+        font-size: 1rem !important;
     }
 
     .math-block {
-        font-size: 0.68rem;
-        padding: 10px 12px;
+        font-size: 0.68rem !important;
+        padding: 10px 12px !important;
     }
 
     .impact {
-        font-size: 0.72rem;
+        font-size: 0.72rem !important;
     }
 
     /* --- Simulator Adjustments --- */
     .sim-panel {
-        padding: 20px;
+        padding: 20px !important;
     }
 
     .output-grid {
-        gap: 10px;
+        gap: 10px !important;
     }
 
     .output-card {
-        padding: 14px 12px;
+        padding: 14px 12px !important;
     }
 
     .output-value {
-        font-size: 1.4rem;
+        font-size: 1.4rem !important;
     }
 
-    /* --- Floating Nav Mobile --- */
+    /* ========================================
+       FLOATING NAV: MOBILE FIX
+       Uses !important to override app.css.
+       ======================================== */
     .floating-nav {
-        bottom: 16px;
-        left: 16px;
-        right: 16px;
-        transform: none;
-        /* Kill the desktop translateX(-50%) */
-        width: auto;
-        flex-direction: column;
-        gap: 8px;
-        padding: 10px;
-        border-radius: var(--radius-lg);
+        position: fixed !important;
+        bottom: 16px !important;
+        left: 16px !important;
+        right: 16px !important;
+        top: auto !important;
+        transform: none !important;
+        width: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        border-radius: 16px !important;
+        z-index: 99999 !important;
     }
 
     .nav-btn {
-        font-size: 0.78rem;
-        padding: 12px 16px;
-        letter-spacing: 1.5px;
-        justify-content: center;
-        text-align: center;
-        border-radius: var(--radius-md);
+        overflow: visible !important;
+        font-size: 0.78rem !important;
+        padding: 14px 16px !important;
+        letter-spacing: 1.5px !important;
+        justify-content: center !important;
+        text-align: center !important;
+        border-radius: 12px !important;
+        white-space: nowrap !important;
     }
 
     .nav-btn .dot {
-        display: none;
-        /* Save space on mobile */
+        display: none !important;
+    }
+
+    /* Extra bottom padding on body so footer
+       content is not hidden by the nav */
+    body {
+        padding-bottom: 130px !important;
     }
 }
 
 @media (max-width: 480px) {
     .ticker-wrap {
-        padding: 8px 0;
+        padding: 8px 0 !important;
     }
 
     .ticker-item {
-        margin-right: 30px;
-        font-size: 0.68rem;
+        margin-right: 30px !important;
+        font-size: 0.68rem !important;
     }
 
     .hero-title {
-        font-size: 3.2rem;
+        font-size: 3.2rem !important;
     }
 
     .hero-thesis {
-        padding: 20px 24px;
+        padding: 20px 24px !important;
     }
 
     .hero-thesis::before,
     .hero-thesis::after {
-        font-size: 2.5rem;
+        font-size: 2.5rem !important;
     }
 
     .table-wrap {
-        border-radius: var(--radius-sm);
+        border-radius: 8px !important;
     }
 
     table {
-        font-size: 0.7rem;
+        font-size: 0.7rem !important;
     }
 
     thead th,
     tbody td {
-        padding: 8px 6px;
+        padding: 8px 6px !important;
     }
 
     .pnl-total td {
-        font-size: 0.82rem;
+        font-size: 0.82rem !important;
     }
 }
