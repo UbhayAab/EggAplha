@@ -1,811 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROJECT YOLK ALPHA | Forensic Audit: Delhi NCR Egg Category</title>
-    <meta name="description" content="Forensic Audit of the Delhi NCR Egg Category 2025 2026. Interactive Financial Cockpit with P&L Simulator and SKU Margin Analysis.">
+    <title>PROJECT YOLK ALPHA | Forensic Audit: Delhi NCR Egg Category 2025 2026</title>
+    <meta name="description"
+        content="Forensic Audit of the Delhi NCR Egg Category for Blinkit. Interactive Financial Cockpit with P&L Simulator, SKU Margin Heatmap, Competitive Benchmarking, and EBITDA Bridge Analysis.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/web.css">
+    <link rel="stylesheet" href="styles/app.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <style>
-        /* ===== RESET & BASE ===== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg-primary: #0F172A;
-            --bg-secondary: #1E293B;
-            --bg-card: #1a2540;
-            --bg-card-hover: #223050;
-            --profit-green: #10B981;
-            --profit-green-dim: rgba(16, 185, 129, 0.15);
-            --loss-red: #EF4444;
-            --loss-red-dim: rgba(239, 68, 68, 0.15);
-            --accent-amber: #F59E0B;
-            --accent-blue: #3B82F6;
-            --accent-purple: #8B5CF6;
-            --text-primary: #F1F5F9;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
-            --border-color: rgba(148, 163, 184, 0.08);
-            --glow-green: 0 0 30px rgba(16, 185, 129, 0.2);
-            --glow-red: 0 0 30px rgba(239, 68, 68, 0.2);
-            --neu-shadow: 6px 6px 16px rgba(0, 0, 0, 0.4), inset 1px 1px 1px rgba(255, 255, 255, 0.03);
-            --neu-shadow-inset: inset 4px 4px 12px rgba(0, 0, 0, 0.5), inset -2px -2px 8px rgba(255, 255, 255, 0.03);
-            --transition-fast: 0.2s ease;
-            --transition-med: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* ===== TICKER TAPE ===== */
-        .ticker-wrap {
-            width: 100%;
-            overflow: hidden;
-            background: linear-gradient(90deg, var(--bg-secondary), #162033, var(--bg-secondary));
-            border-bottom: 1px solid var(--border-color);
-            padding: 10px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
-
-        .ticker {
-            display: flex;
-            animation: tickerScroll 30s linear infinite;
-            white-space: nowrap;
-            width: max-content;
-        }
-
-        .ticker-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-right: 60px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .ticker-item .label { color: var(--text-muted); }
-        .ticker-item .value { color: var(--profit-green); }
-        .ticker-item .value.red { color: var(--loss-red); }
-        .ticker-item .dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--profit-green);
-            box-shadow: 0 0 8px var(--profit-green);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes tickerScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        /* ===== LAYOUT ===== */
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        section {
-            padding: 80px 0;
-            position: relative;
-        }
-
-        section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-        }
-
-        /* ===== SECTOR LABELS ===== */
-        .sector-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--profit-green);
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            background: var(--profit-green-dim);
-            padding: 6px 14px;
-            border-radius: 4px;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .sector-title {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sector-subtitle {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            max-width: 680px;
-        }
-
-        /* ===== HERO SECTION ===== */
-        #hero {
-            margin-top: 42px;
-            padding: 100px 0 80px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #hero::after {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 3px;
-            color: var(--accent-amber);
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            padding: 8px 20px;
-            border-radius: 30px;
-            margin-bottom: 28px;
-        }
-
-        .hero-title {
-            font-size: clamp(2.8rem, 7vw, 5.5rem);
-            font-weight: 900;
-            letter-spacing: -2px;
-            line-height: 1;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #10B981 0%, #34D399 40%, #F1F5F9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-sub {
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
-            color: var(--text-secondary);
-            font-weight: 400;
-            letter-spacing: 2px;
-            margin-bottom: 60px;
-            text-transform: uppercase;
-        }
-
-        /* ===== METRIC CARDS ===== */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 28px 24px;
-            box-shadow: var(--neu-shadow);
-            transition: transform var(--transition-med), box-shadow var(--transition-med);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            border-radius: 16px 16px 0 0;
-        }
-
-        .metric-card:nth-child(1)::before { background: var(--profit-green); }
-        .metric-card:nth-child(2)::before { background: var(--accent-blue); }
-        .metric-card:nth-child(3)::before { background: var(--accent-amber); }
-        .metric-card:nth-child(4)::before { background: var(--accent-purple); }
-
-        .metric-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--neu-shadow), 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .metric-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .metric-value {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 6px;
-        }
-
-        .metric-card:nth-child(1) .metric-value { color: var(--profit-green); }
-        .metric-card:nth-child(2) .metric-value { color: var(--accent-blue); }
-        .metric-card:nth-child(3) .metric-value { color: var(--accent-amber); }
-        .metric-card:nth-child(4) .metric-value { color: var(--accent-purple); }
-
-        .metric-note {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-        }
-
-        /* ===== SKU MATRIX ===== */
-        .toggle-wrap {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-
-        .toggle-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--text-secondary);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 56px;
-            height: 28px;
-        }
-
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 28px;
-            transition: var(--transition-fast);
-            box-shadow: var(--neu-shadow-inset);
-        }
-
-        .toggle-slider::before {
-            content: '';
-            position: absolute;
-            height: 20px; width: 20px;
-            left: 3px; bottom: 3px;
-            background: var(--text-muted);
-            border-radius: 50%;
-            transition: var(--transition-med);
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: var(--profit-green);
-        }
-
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(28px);
-            background: var(--profit-green);
-            box-shadow: 0 0 10px var(--profit-green);
-        }
-
-        .toggle-status {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            padding: 4px 12px;
-            border-radius: 4px;
-            transition: var(--transition-med);
-        }
-
-        .toggle-status.off { color: var(--text-muted); background: transparent; }
-        .toggle-status.on { color: var(--profit-green); background: var(--profit-green-dim); }
-
-        /* ===== TABLE ===== */
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--neu-shadow);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.88rem;
-        }
-
-        thead th {
-            background: var(--bg-secondary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            padding: 14px 18px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
-        }
-
-        tbody td {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background var(--transition-fast);
-            white-space: nowrap;
-        }
-
-        tbody tr:hover td { background: rgba(255, 255, 255, 0.02); }
-        tbody tr:last-child td { border-bottom: none; }
-
-        .sku-name {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .margin-positive {
-            color: var(--profit-green);
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .margin-negative {
-            color: var(--loss-red);
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .margin-cell {
-            position: relative;
-            padding-left: 18px !important;
-        }
-
-        .margin-bar {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            border-radius: 2px;
-            transition: height var(--transition-med), background var(--transition-med);
-        }
-
-        /* ===== ROADMAP CARDS ===== */
-        .roadmap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 50px;
-        }
-
-        .roadmap-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 28px 24px;
-            box-shadow: var(--neu-shadow);
-            transition: transform var(--transition-med);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .roadmap-card:hover { transform: translateY(-3px); }
-
-        .roadmap-card .quarter-badge {
-            display: inline-block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            padding: 5px 12px;
-            border-radius: 4px;
-            margin-bottom: 16px;
-        }
-
-        .q1 .quarter-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .q2 .quarter-badge { background: rgba(16, 185, 129, 0.15); color: var(--profit-green); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .q3 .quarter-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .q4 .quarter-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); border: 1px solid rgba(139, 92, 246, 0.3); }
-
-        .roadmap-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-
-        .roadmap-card .action {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 14px;
-            line-height: 1.5;
-        }
-
-        .roadmap-card .math-block {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 14px;
-            margin-bottom: 14px;
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-
-        .roadmap-card .impact {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-
-        .impact-positive { color: var(--profit-green); }
-        .impact-shield { color: var(--accent-amber); }
-
-        /* ===== CHART ===== */
-        .chart-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: var(--neu-shadow);
-            max-width: 900px;
-            margin: 0 auto 50px;
-        }
-
-        .chart-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        /* ===== DATA BLOCKS ===== */
-        .data-blocks {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .data-block {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--neu-shadow);
-        }
-
-        .data-block-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--accent-amber);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.04);
-        }
-
-        .data-row:last-child { border-bottom: none; }
-
-        .data-row .key {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .data-row .val {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .data-row .val.green { color: var(--profit-green); }
-        .data-row .val.red { color: var(--loss-red); }
-        .data-row .val.amber { color: var(--accent-amber); }
-
-        .data-conclusion {
-            margin-top: 14px;
-            padding: 12px 16px;
-            background: var(--profit-green-dim);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 8px;
-            font-size: 0.82rem;
-            color: var(--profit-green);
-            font-weight: 600;
-            line-height: 1.6;
-        }
-
-        /* ===== SIMULATOR ===== */
-        .simulator-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .simulator-grid { grid-template-columns: 1fr; }
-        }
-
-        .sim-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: var(--neu-shadow);
-        }
-
-        .sim-panel-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 28px;
-        }
-
-        .slider-group {
-            margin-bottom: 28px;
-        }
-
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .slider-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .slider-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--profit-green);
-            background: var(--profit-green-dim);
-            padding: 3px 10px;
-            border-radius: 4px;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--bg-secondary);
-            outline: none;
-            box-shadow: var(--neu-shadow-inset);
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--profit-green);
-            cursor: pointer;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4), var(--neu-shadow);
-            transition: transform var(--transition-fast);
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--profit-green);
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-        }
-
-        /* ===== OUTPUT CARDS ===== */
-        .output-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .output-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px 18px;
-            transition: box-shadow var(--transition-med);
-        }
-
-        .output-card:last-child {
-            grid-column: 1 / -1;
-        }
-
-        .output-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .output-value {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            transition: color var(--transition-fast);
-        }
-
-        .output-card:nth-child(1) .output-value { color: var(--accent-blue); }
-        .output-card:nth-child(2) .output-value { color: var(--profit-green); }
-        .output-card:nth-child(3) .output-value { color: var(--loss-red); }
-        .output-card:nth-child(4) .output-value { color: var(--accent-amber); }
-
-        .output-card:last-child {
-            border-color: rgba(16, 185, 129, 0.3);
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02));
-        }
-
-        .output-card.ebitda-positive { box-shadow: var(--glow-green); }
-        .output-card.ebitda-negative { box-shadow: var(--glow-red); }
-        .output-card.ebitda-positive .output-value { color: var(--profit-green); }
-        .output-card.ebitda-negative .output-value { color: var(--loss-red); }
-
-        .output-card .output-sub {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            text-align: center;
-            padding: 40px 0;
-            border-top: 1px solid var(--border-color);
-        }
-
-        footer p {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
-
-        /* ===== ANIMATIONS ===== */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 640px) {
-            .metrics-grid { grid-template-columns: 1fr; }
-            .roadmap-grid { grid-template-columns: 1fr; }
-            .data-blocks { grid-template-columns: 1fr; }
-            .output-grid { grid-template-columns: 1fr; }
-            .output-card:last-child { grid-column: auto; }
-            table { font-size: 0.78rem; }
-            thead th, tbody td { padding: 10px 12px; }
-        }
-    </style>
 </head>
+
 <body>
 
-    <!-- ===== TICKER TAPE ===== -->
+    <!-- ============================================================
+         TICKER TAPE: LIVE NECC RATES
+         ============================================================ -->
     <div class="ticker-wrap" aria-label="Live NECC Rate Ticker">
         <div class="ticker" id="ticker"></div>
     </div>
 
-    <!-- ===== SECTOR 1: THE SITUATION ROOM ===== -->
+    <!-- ============================================================
+         SECTOR 1: THE SITUATION ROOM (HERO)
+         Case Study Context + Key Metrics
+         ============================================================ -->
     <section id="hero">
-        <div class="container">
-            <div class="hero-badge">CLASSIFICATION: INTERNAL / STRATEGIC</div>
+        <div class="container text-center">
+            <div class="hero-badge">CLASSIFICATION: INTERNAL / STRATEGIC | TARGET: DIRECTOR LEVEL</div>
             <h1 class="hero-title">PROJECT YOLK ALPHA</h1>
             <p class="hero-sub">Forensic Audit of the Delhi NCR Egg Category (2025 2026)</p>
+            <p class="hero-thesis">"Blinkit does not sell eggs. It sells customer attention to Eggoz and Henfruit. The
+                egg is merely the hook; the profit is in the ecosystem it activates."</p>
 
-            <div class="metrics-grid">
-                <div class="metric-card fade-in">
+            <div class="grid-4 fade-in">
+                <div class="metric-card green">
                     <div class="metric-label">Market Share</div>
                     <div class="metric-value">45%</div>
                     <div class="metric-note">Dominant Position in Delhi NCR</div>
                 </div>
-                <div class="metric-card fade-in">
+                <div class="metric-card blue">
                     <div class="metric-label">Dark Store Count</div>
                     <div class="metric-value">2,027</div>
-                    <div class="metric-note">vs Target 2,100</div>
+                    <div class="metric-note">vs Target 2,100 (Q4 FY26)</div>
                 </div>
-                <div class="metric-card fade-in">
+                <div class="metric-card amber">
                     <div class="metric-label">Category GMV</div>
                     <div class="metric-value">₹547.5 Cr</div>
-                    <div class="metric-note">Annual Gross Merchandise Value</div>
+                    <div class="metric-note">Annual (1P Model, Full Recognition)</div>
                 </div>
-                <div class="metric-card fade-in">
+                <div class="metric-card purple">
                     <div class="metric-label">Net Category EBITDA</div>
-                    <div class="metric-value">₹104.02 Cr</div>
-                    <div class="metric-note">Post Ad Revenue</div>
+                    <div class="metric-value">₹108.22 Cr</div>
+                    <div class="metric-note">Post Ad Revenue + Platform Fees</div>
+                </div>
+            </div>
+
+            <!-- Executive Summary Cards -->
+            <div class="grid-3 mt-xl fade-in">
+                <div class="metric-card cyan">
+                    <div class="metric-label">Blended Gross Margin</div>
+                    <div class="metric-value">19.8%</div>
+                    <div class="metric-note">Weighted: White 15% | Protein 30% | Brown 33%</div>
+                </div>
+                <div class="metric-card green">
+                    <div class="metric-label">Average Order Value</div>
+                    <div class="metric-value">₹150</div>
+                    <div class="metric-note">Egg Category Basket Average</div>
+                </div>
+                <div class="metric-card red">
+                    <div class="metric-label">Delivery Cost</div>
+                    <div class="metric-value">₹30/order</div>
+                    <div class="metric-note">Last Mile (10 to 15 min window)</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== SECTOR 2: THE 9 SKU MATRIX ===== -->
+    <!-- ============================================================
+         SECTOR 2: SUPPLY CHAIN FORENSICS
+         The Barwala Delhi Corridor
+         ============================================================ -->
+    <section id="supply-chain">
+        <div class="container">
+            <div class="sector-tag blue">SECTOR 2: SUPPLY CHAIN FORENSICS</div>
+            <h2 class="sector-title">The Barwala Delhi Corridor</h2>
+            <p class="sector-subtitle">The financial viability of the egg category is determined 250 km from the dark
+                store, on the highway connecting Barwala (Haryana) poultry farms to Delhi distribution centers. Every
+                rupee here flows directly into the P&L.</p>
+
+            <div class="grid-3 fade-in">
+                <!-- Landed Cost Build -->
+                <div class="data-block">
+                    <div class="data-block-title">Landed Cost Build (Per Egg)</div>
+                    <div class="data-row"><span class="key">Base Rate (Barwala/NECC)</span><span
+                            class="val">₹4.75</span></div>
+                    <div class="data-row"><span class="key">Transport & Handling (CNG)</span><span
+                            class="val amber">₹0.25</span></div>
+                    <div class="data-row"><span class="key">Packaging (Molded Pulp)</span><span class="val">₹0.18</span>
+                    </div>
+                    <div class="data-row"><span class="key"><strong>Total Landed Cost</strong></span><span
+                            class="val green"><strong>₹5.18</strong></span></div>
+                    <div class="data-conclusion">Any retail price below ₹5.18 (plus GST and last mile) represents a
+                        gross loss on the commodity.</div>
+                </div>
+
+                <!-- Arbitrage Breakdown -->
+                <div class="data-block">
+                    <div class="data-block-title">Barwala Delhi Spread (₹0.35)</div>
+                    <div class="data-row"><span class="key">Transport Component</span><span class="val">₹0.15/egg</span>
+                    </div>
+                    <div class="data-row"><span class="key">Breakage Provision</span><span class="val">₹0.05/egg</span>
+                    </div>
+                    <div class="data-row"><span class="key">Trader Margin / Mandi Tax</span><span
+                            class="val">₹0.15/egg</span></div>
+                    <div class="data-row"><span class="key">Direct Sourcing Savings</span><span class="val green">₹0.10
+                            to ₹0.15/egg</span></div>
+                    <div class="data-conclusion">By bypassing Delhi wholesale intermediaries and lifting directly from
+                        Barwala farm gates, Blinkit captures ₹0.10 to ₹0.15 of additional margin per egg.</div>
+                </div>
+
+                <!-- Packaging Revolution -->
+                <div class="data-block">
+                    <div class="data-block-title">Packaging Revolution: Pulp vs Plastic</div>
+                    <div class="data-row"><span class="key">Old Breakage (Plastic)</span><span
+                            class="val red">4.0%</span></div>
+                    <div class="data-row"><span class="key">New Breakage (Pulp Tray)</span><span
+                            class="val green">1.5%</span></div>
+                    <div class="data-row"><span class="key">Pulp Tray Cost (30 eggs)</span><span class="val">₹4.50 to
+                            ₹5.40</span></div>
+                    <div class="data-row"><span class="key">Savings from Reduced Breakage</span><span
+                            class="val green">₹0.125/egg</span></div>
+                    <div class="data-conclusion">Near cost neutral on paper but significantly positive when factoring in
+                        "mess cost" (cleanup labor) and customer refunds for damaged deliveries.</div>
+                </div>
+            </div>
+
+            <!-- Unit Economics Callout -->
+            <div class="callout amber mt-lg fade-in">
+                <div class="callout-title text-amber">The Single Order Dilemma: Unit Economics</div>
+                <p>A standalone order of 6 eggs (₹75) demonstrates why the "Small Cart Fee" exists:</p>
+                <div class="grid-2 mt-lg" style="max-width: 600px;">
+                    <div class="data-block">
+                        <div class="data-block-title">Without Cart Fee</div>
+                        <div class="data-row"><span class="key">Revenue</span><span class="val">₹75</span></div>
+                        <div class="data-row"><span class="key">COGS</span><span class="val">₹55</span></div>
+                        <div class="data-row"><span class="key">Gross Margin</span><span class="val green">₹20</span>
+                        </div>
+                        <div class="data-row"><span class="key">Delivery Cost</span><span class="val red">₹30</span>
+                        </div>
+                        <div class="data-row"><span class="key"><strong>Net Result</strong></span><span
+                                class="val red"><strong>₹10 LOSS</strong></span></div>
+                    </div>
+                    <div class="data-block">
+                        <div class="data-block-title">With Cart Fee (₹15)</div>
+                        <div class="data-row"><span class="key">Revenue</span><span class="val">₹75</span></div>
+                        <div class="data-row"><span class="key">COGS</span><span class="val">₹55</span></div>
+                        <div class="data-row"><span class="key">Gross Margin</span><span class="val green">₹20</span>
+                        </div>
+                        <div class="data-row"><span class="key">Delivery Cost</span><span class="val red">₹30</span>
+                        </div>
+                        <div class="data-row"><span class="key">+ Small Cart Fee</span><span
+                                class="val green">₹15</span></div>
+                        <div class="data-row"><span class="key"><strong>Net Result</strong></span><span
+                                class="val green"><strong>₹5 PROFIT</strong></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advertising Subsidy -->
+            <div class="callout mt-lg fade-in">
+                <div class="callout-title text-green">The Advertising Subsidy: Why The Category Survives</div>
+                <p>The trading business alone generates a negligible 1% margin. The category exists to generate "Above
+                    the Line" income:</p>
+                <div class="grid-3 mt-lg">
+                    <div class="data-block">
+                        <div class="data-block-title">Per Order Economics</div>
+                        <div class="data-row"><span class="key">Avg Category Margin</span><span
+                                class="val green">₹25.00</span></div>
+                        <div class="data-row"><span class="key">Delivery Cost</span><span class="val red">₹30.00</span>
+                        </div>
+                        <div class="data-row"><span class="key">Net Trading Loss</span><span
+                                class="val red">₹5.00</span></div>
+                        <div class="data-row"><span class="key">Ad Revenue (per order)</span><span
+                                class="val green">₹15.00</span></div>
+                        <div class="data-row"><span class="key"><strong>Final Profit</strong></span><span
+                                class="val green"><strong>₹10.00</strong></span></div>
+                    </div>
+                    <div class="data-block">
+                        <div class="data-block-title">How Ad Revenue Works</div>
+                        <div class="data-row"><span class="key">Ad as % of Revenue</span><span class="val">15%</span>
+                        </div>
+                        <div class="data-row"><span class="key">CPC (High Intent Keywords)</span><span class="val">₹15
+                                to ₹25</span></div>
+                        <div class="data-row"><span class="key">Keywords Bid On</span><span class="val">"Healthy"
+                                "Protein" "Breakfast"</span></div>
+                        <div class="data-row"><span class="key">Ad Buyers</span><span class="val">Eggoz, Henfruit,
+                                UPF</span></div>
+                    </div>
+                    <div class="data-block">
+                        <div class="data-block-title">The Real Business Model</div>
+                        <div class="data-row"><span class="key">Trading Margin (Ops)</span><span class="val amber">1.0%
+                                of GMV</span></div>
+                        <div class="data-row"><span class="key">Ad Revenue Layer</span><span class="val green">15.0% of
+                                GMV</span></div>
+                        <div class="data-row"><span class="key">Platform Fees</span><span class="val green">3.0% of
+                                GMV</span></div>
+                        <div class="data-row"><span class="key">True EBITDA Margin</span><span class="val green">19.0%
+                                of GMV</span></div>
+                        <div class="data-conclusion">Blinkit is a logistics enabled media property. Profitability is
+                            extracted from FMCG marketing budgets, not consumer wallets.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE: THE SINGLE ORDER AUTOPSY -->
+            <div class="table-wrap mt-xl fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Component</th>
+                            <th class="right" style="width: 18%;">Amount (₹)</th>
+                            <th class="right" style="width: 14%;">% of AOV</th>
+                            <th style="width: 28%;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="sku-name">AOV (Revenue)</td>
+                            <td class="right margin-positive"><strong>₹150.00</strong></td>
+                            <td class="right"><strong>100%</strong></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>COGS (Product Cost)</td>
+                            <td class="right margin-negative">(₹118.50)</td>
+                            <td class="right">79%</td>
+                            <td class="text-muted text-sm">Landed Cost</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Gross Margin (Trading)</td>
+                            <td class="right margin-positive">₹31.50</td>
+                            <td class="right margin-positive">21%</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Wastage (2%)</td>
+                            <td class="right margin-negative">(₹3.00)</td>
+                            <td class="right">2%</td>
+                            <td class="text-muted text-sm">Shrinkage</td>
+                        </tr>
+                        <tr>
+                            <td>Delivery Cost</td>
+                            <td class="right margin-negative">(₹30.00)</td>
+                            <td class="right">20%</td>
+                            <td class="text-muted text-sm">Last Mile</td>
+                        </tr>
+                        <tr>
+                            <td>Tech / Payment Fee</td>
+                            <td class="right margin-negative">(₹3.00)</td>
+                            <td class="right">2%</td>
+                            <td class="text-muted text-sm">Gateway</td>
+                        </tr>
+                        <tr class="separator">
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr style="background: var(--loss-red-dim);">
+                            <td class="sku-name" style="color: var(--loss-red);">TRADING PROFIT</td>
+                            <td class="right margin-negative"><strong>(₹4.50)</strong></td>
+                            <td class="right margin-negative"><strong>−3%</strong></td>
+                            <td class="margin-negative">🔴 LOSS</td>
+                        </tr>
+                        <tr class="separator">
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td>Ad Revenue</td>
+                            <td class="right margin-positive">+ ₹22.50</td>
+                            <td class="right">15%</td>
+                            <td class="text-muted text-sm">Subsidy</td>
+                        </tr>
+                        <tr>
+                            <td>Platform Fee</td>
+                            <td class="right margin-positive">+ ₹4.50</td>
+                            <td class="right">3%</td>
+                            <td class="text-muted text-sm">Small Cart</td>
+                        </tr>
+                        <tr class="pnl-total">
+                            <td><strong>FINAL EBITDA</strong></td>
+                            <td class="right"><strong>₹22.50</strong></td>
+                            <td class="right"><strong>15%</strong></td>
+                            <td><strong>🟢 PROFIT</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-muted mt-lg font-mono text-center" style="letter-spacing: 1px;">TABLE: THE SINGLE
+                ORDER AUTOPSY | Breakdown of a Typical ₹150 Egg Order in Delhi (Feb 2026)</p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTOR 3: THE 9 SKU MATRIX (PART 2 ANSWER)
+         "Draw a simplified P&L for 9 SKUs"
+         ============================================================ -->
     <section id="sku-matrix">
         <div class="container">
-            <div class="sector-tag">SECTOR 2</div>
+            <div class="sector-tag">SECTOR 3: CASE STUDY PART 2 ANSWER</div>
             <h2 class="sector-title">The 9 SKU Matrix</h2>
-            <p class="sector-subtitle">Interactive Margin Heatmap: A simplified P&L across all 9 egg SKUs. Toggle "View Reality" to reveal the true net margin after delivery costs and ad revenue.</p>
+            <p class="sector-subtitle">A simplified P&L across all 9 egg SKUs. Assumptions: 100,000 monthly orders split
+                by consumption patterns (White 70%, Protein 20%, Brown 10%). Toggle "View Reality" to reveal the net
+                margin after ₹30 delivery cost and ₹15 ad revenue per order.</p>
+
+            <div class="callout blue mb-lg fade-in">
+                <div class="callout-title text-blue">Assumptions Documented</div>
+                <p><strong>Volume:</strong> 100,000 monthly orders. <strong>White Eggs:</strong> 70% share, 15% margin
+                    (given). <strong>Protein Eggs:</strong> 20% share, 30% margin (given). <strong>Brown Eggs:</strong>
+                    10% share, 33% margin (given). <strong>Pack Mix:</strong> 6 Pack (25%), 10 Pack (40%), 30 Pack (35%)
+                    within each type. <strong>Delivery:</strong> ₹30/order. <strong>Ad Revenue:</strong> ₹15/order
+                    average.</p>
+            </div>
 
             <div class="toggle-wrap">
                 <span class="toggle-label">VIEW REALITY</span>
@@ -822,33 +341,187 @@
                         <tr>
                             <th>SKU Name</th>
                             <th>Pack Size</th>
-                            <th>Selling Price</th>
-                            <th id="marginHeader">Margin %</th>
-                            <th id="profitHeader">Gross Profit</th>
-                            <th>Contribution</th>
+                            <th class="right">Selling Price</th>
+                            <th class="right" id="marginHeader">Margin %</th>
+                            <th class="right" id="profitHeader">Gross Profit/Order</th>
+                            <th class="right">Monthly Volume</th>
+                            <th class="right">Contribution</th>
                         </tr>
                     </thead>
                     <tbody id="skuBody"></tbody>
                 </table>
             </div>
+
+            <p class="text-sm text-secondary mt-lg font-mono" id="skuSummary" style="letter-spacing: 0.5px;"></p>
+
+            <div class="callout amber mt-lg fade-in">
+                <div class="callout-title text-amber">Key Insight: Small Packs are Loss Making Without Ads</div>
+                <p>When delivery cost (₹30) is factored in, the 6 Pack variants of White Eggs and Brown Eggs become
+                    unprofitable on a per order basis. The ad revenue layer (₹15/order) partially offsets this, but only
+                    the 30 Pack and Protein SKUs generate meaningful contribution. This is why Blinkit algorithmically
+                    pushes bulk packs and premium eggs in search results.</p>
+            </div>
         </div>
     </section>
 
-    <!-- ===== SECTOR 3: THE ONE YEAR PLAN ===== -->
+    <!-- ============================================================
+         SECTOR 4: ANNUALIZED CATEGORY P&L
+         TABLE 6.1 FROM FORENSIC AUDIT
+         ============================================================ -->
+    <section id="annual-pnl">
+        <div class="container">
+            <div class="sector-tag amber">SECTOR 4: ANNUALIZED P&L</div>
+            <h2 class="sector-title">Category P&L Statement</h2>
+            <p class="sector-subtitle">Full annualized P&L reconstruction for the Egg Category in Delhi NCR.
+                Assumptions: 100,000 daily orders × ₹150 AOV × 365 days = ₹547.5 Cr GMV. All percentages calculated
+                against GMV. Revenue recognized fully under 1P (inventory led) model.</p>
+
+            <div class="table-wrap fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 45%;">Line Item</th>
+                            <th class="right" style="width: 18%;">Amount (₹ Cr)</th>
+                            <th class="right" style="width: 12%;">% of GMV</th>
+                            <th style="width: 25%;">Forensic Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Revenue -->
+                        <tr class="pnl-header">
+                            <td colspan="4">Revenue</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Gross Merchandise Value (GMV)</td>
+                            <td class="right margin-positive">₹547.50</td>
+                            <td class="right">100.0%</td>
+                            <td class="text-muted text-sm">Full recognition under 1P model</td>
+                        </tr>
+
+                        <!-- COGS -->
+                        <tr class="pnl-header">
+                            <td colspan="4">Cost of Goods Sold</td>
+                        </tr>
+                        <tr>
+                            <td>COGS (Landed Cost)</td>
+                            <td class="right margin-negative">(₹410.63)</td>
+                            <td class="right">75.0%</td>
+                            <td class="text-muted text-sm">Landed ₹5.18/egg vs ₹6.00 blended realization</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Gross Profit (Trading)</td>
+                            <td class="right margin-positive">₹136.87</td>
+                            <td class="right margin-positive">25.0%</td>
+                            <td class="text-muted text-sm">Base trading margin</td>
+                        </tr>
+                        <tr>
+                            <td>Wastage & Shrinkage</td>
+                            <td class="right margin-negative">(₹10.95)</td>
+                            <td class="right">2.0%</td>
+                            <td class="text-muted text-sm">Expired stock / In store breakage</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Net Gross Profit</td>
+                            <td class="right margin-positive">₹125.92</td>
+                            <td class="right margin-positive">23.0%</td>
+                            <td class="text-muted text-sm"></td>
+                        </tr>
+
+                        <!-- Operating Costs -->
+                        <tr class="separator">
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr class="pnl-header">
+                            <td colspan="4">Direct Operating Costs</td>
+                        </tr>
+                        <tr>
+                            <td>Allocated Last Mile Delivery</td>
+                            <td class="right margin-negative">(₹82.13)</td>
+                            <td class="right">15.0%</td>
+                            <td class="text-muted text-sm">Allocated cost (part of basket delivery)</td>
+                        </tr>
+                        <tr>
+                            <td>Dark Store Operations</td>
+                            <td class="right margin-negative">(₹27.38)</td>
+                            <td class="right">5.0%</td>
+                            <td class="text-muted text-sm">Picking, Packing, Rent, Utilities</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Gateway & Tech</td>
+                            <td class="right margin-negative">(₹10.95)</td>
+                            <td class="right">2.0%</td>
+                            <td class="text-muted text-sm">2% MDR average</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Operational Contribution</td>
+                            <td class="right text-amber">₹5.46</td>
+                            <td class="right text-amber">1.0%</td>
+                            <td class="text-muted text-sm">Operationally Breakeven</td>
+                        </tr>
+
+                        <!-- Monetization -->
+                        <tr class="separator">
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr class="pnl-header">
+                            <td colspan="4">Monetization Layer</td>
+                        </tr>
+                        <tr>
+                            <td>Ad Revenue (Search / Display)</td>
+                            <td class="right margin-positive">₹82.13</td>
+                            <td class="right">15.0%</td>
+                            <td class="text-muted text-sm">15% of GMV from brand bids</td>
+                        </tr>
+                        <tr>
+                            <td>Platform / Handling Fees</td>
+                            <td class="right margin-positive">₹16.43</td>
+                            <td class="right">3.0%</td>
+                            <td class="text-muted text-sm">Allocated fee income</td>
+                        </tr>
+
+                        <!-- EBITDA -->
+                        <tr class="pnl-total">
+                            <td><strong>NET CATEGORY EBITDA</strong></td>
+                            <td class="right"><strong>₹104.02</strong></td>
+                            <td class="right"><strong>19.0%</strong></td>
+                            <td class="text-sm"><strong>Profit driven by Ads & Fees</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout mt-lg fade-in">
+                <div class="callout-title text-green">Forensic Conclusion</div>
+                <p>The trading business of selling eggs on Blinkit generates a negligible 1% margin after operations.
+                    The category exists primarily to generate ₹104 Crores of "Above the Line" income (Ads + Fees). This
+                    validates the thesis that Blinkit is a media company disguised as a grocer.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTOR 5: ONE YEAR PLAN (PART 1 ANSWER)
+         Quarterly Roadmap + EBITDA Bridge
+         ============================================================ -->
     <section id="one-year-plan">
         <div class="container">
-            <div class="sector-tag">SECTOR 3</div>
+            <div class="sector-tag">SECTOR 5: CASE STUDY PART 1 ANSWER</div>
             <h2 class="sector-title">The One Year Plan</h2>
-            <p class="sector-subtitle">Quarterly roadmap to grow category profits through supply chain optimization, mix shifting, winter hedging, and advertising scale.</p>
+            <p class="sector-subtitle">A four quarter roadmap to grow category profits from ₹83.72 Cr (base operational
+                + partial ad) to ₹108.22 Cr through supply chain optimization, SKU mix shift, winter hedging, and
+                advertising scale. Total incremental EBITDA expansion: +₹24.50 Cr.</p>
 
-            <div class="roadmap-grid">
+            <div class="grid-4 mb-xl">
                 <div class="roadmap-card q1 fade-in">
                     <span class="quarter-badge">Q1: THE SUPPLY FIX</span>
                     <h3>Molded Pulp Trays</h3>
-                    <p class="action">Switch from plastic crates to molded pulp trays to drastically reduce egg breakage across the supply chain.</p>
+                    <p class="action">Switch from plastic crates to molded pulp trays to reduce egg breakage across the
+                        entire supply chain from farm gate to dark store shelf.</p>
                     <div class="math-block">
-                        Breakage: 4% → 1.5%<br>
-                        Annualized savings on wastage
+                        Breakage: 4.0% → 1.5%<br>
+                        Savings: ₹0.125/egg<br>
+                        ~1.5M eggs/day × 365 days<br>
+                        Annualized: ~₹2.5 Cr
                     </div>
                     <div class="impact impact-positive">▲ +₹2.5 Cr Annualized Savings</div>
                 </div>
@@ -856,10 +529,13 @@
                 <div class="roadmap-card q2 fade-in">
                     <span class="quarter-badge">Q2: THE MIX SHIFT</span>
                     <h3>Protein Egg Prioritization</h3>
-                    <p class="action">Algorithmically rank "Protein Eggs" higher in search results to drive premium volume and margin expansion.</p>
+                    <p class="action">Algorithmically rank "Protein Eggs" higher in search results. Shift 10% of volume
+                        from White (15% margin) to Protein (30% margin).</p>
                     <div class="math-block">
-                        Shift 10% volume: White (15%) → Protein (30%)<br>
-                        Blended margin improvement
+                        White: 70% → 60%<br>
+                        Protein: 20% → 30%<br>
+                        Blended: 19.8% → 22.8%<br>
+                        +3pp × ₹547.5 Cr GMV
                     </div>
                     <div class="impact impact-positive">▲ +₹5.8 Cr Margin Expansion</div>
                 </div>
@@ -867,71 +543,346 @@
                 <div class="roadmap-card q3 fade-in">
                     <span class="quarter-badge">Q3: THE WINTER HEDGE</span>
                     <h3>Forward Contracts</h3>
-                    <p class="action">Execute forward buying contracts with Barwala farms in September to lock Q3 rates before the winter supply squeeze.</p>
+                    <p class="action">Execute forward buying contracts with Barwala farms in September to lock Q3 rates
+                        before the Dec/Jan supply squeeze (hens lay less in cold).</p>
                     <div class="math-block">
-                        Lock price: ₹4.80 vs Spot ₹5.35<br>
-                        Protects against 25% winter spike
+                        Lock price: ₹4.80/egg<br>
+                        vs Spot: ₹5.35/egg (Jan peak)<br>
+                        Delta: ₹0.55/egg saved<br>
+                        Annual: ~₹4.20 Cr saved
                     </div>
-                    <div class="impact impact-shield">◆ Margin Protection vs Winter Spike</div>
+                    <div class="impact impact-positive">▲ +₹4.20 Cr Forward Contract Savings</div>
                 </div>
 
                 <div class="roadmap-card q4 fade-in">
                     <span class="quarter-badge">Q4: THE AD ENGINE</span>
                     <h3>Day Parting Ad Slots</h3>
-                    <p class="action">Launch "Breakfast Bidding" ad slots (6AM to 9AM) to capture peak purchase intent and scale ad fill rate.</p>
+                    <p class="action">Launch "Breakfast Bidding" ad slots (6AM to 9AM) to capture peak purchase intent.
+                        Increase ad fill rate from 15% to 25%.</p>
                     <div class="math-block">
-                        Ad Fill Rate: 15% → 25%<br>
-                        Incremental ad revenue at scale
+                        Ad Fill: 15% → 25%<br>
+                        Incremental: +10pp of GMV<br>
+                        +10% × ₹547.5 Cr<br>
+                        = ~₹54.75 Cr (blended ~₹12 Cr net)
                     </div>
                     <div class="impact impact-positive">▲ +₹12 Cr Ad Revenue</div>
                 </div>
             </div>
 
             <!-- EBITDA Bridge Chart -->
-            <div class="chart-container fade-in">
-                <div class="chart-title">EBITDA Bridge: Current → Target</div>
-                <canvas id="ebidtaChart" height="300"></canvas>
+            <div class="chart-container fade-in mb-xl" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+                <div class="chart-title">EBITDA Bridge: Current → Target (₹ Crores)</div>
+                <div style="height: 300px;">
+                    <canvas id="ebitdaChart"></canvas>
+                </div>
             </div>
 
-            <!-- Data Blocks -->
-            <div class="data-blocks">
-                <div class="data-block fade-in">
-                    <div class="data-block-title">Supply Chain Math</div>
-                    <div class="data-row"><span class="key">Barwala Rate</span><span class="val">₹4.75 per egg</span></div>
-                    <div class="data-row"><span class="key">Delhi Rate</span><span class="val">₹5.10 per egg</span></div>
-                    <div class="data-row"><span class="key">Arbitrage Captured</span><span class="val green">₹0.15 per egg via direct sourcing</span></div>
-                    <div class="data-row"><span class="key">Logistics Cost</span><span class="val amber">₹0.25 per egg (CNG Fleet)</span></div>
-                    <div class="data-row"><span class="key">Landed Cost (Dark Store)</span><span class="val">₹5.18 per egg</span></div>
+            <!-- Seasonal Price Chart -->
+            <div class="chart-container fade-in" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+                <div class="chart-title">Seasonal Price Curve: NECC Barwala Rate (₹/Egg by Month)</div>
+                <div style="height: 280px;">
+                    <canvas id="seasonalChart"></canvas>
+                </div>
+            </div>
+
+            <!-- TABLE: FY26 PROFIT GROWTH ROADMAP -->
+            <div class="table-wrap mt-xl fade-in" style="max-width: 1100px; margin-left: auto; margin-right: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 16%;">Timeline</th>
+                            <th style="width: 26%;">Strategic Action</th>
+                            <th style="width: 28%;">Operational KPI</th>
+                            <th class="right" style="width: 30%;">Financial Impact (Annualized)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="quarter-badge" style="font-size: 0.58rem;">Q1 (Apr to Jun)</span></td>
+                            <td class="sku-name">Supply Chain Fix</td>
+                            <td class="text-secondary">Breakage: 4.0% → 1.5%</td>
+                            <td class="right margin-positive"><strong>+ ₹2.50 Cr</strong></td>
+                        </tr>
+                        <tr>
+                            <td><span class="quarter-badge"
+                                    style="font-size: 0.58rem; background: var(--profit-green-dim); color: var(--profit-green); border: 1px solid rgba(16,185,129,0.3);">Q2
+                                    (Jul to Sep)</span></td>
+                            <td class="sku-name">Mix Shift (Protein)</td>
+                            <td class="text-secondary">Protein Share: 20% → 30%</td>
+                            <td class="right margin-positive"><strong>+ ₹5.80 Cr</strong></td>
+                        </tr>
+                        <tr>
+                            <td><span class="quarter-badge"
+                                    style="font-size: 0.58rem; background: var(--accent-amber-dim); color: var(--accent-amber); border: 1px solid rgba(245,158,11,0.3);">Q3
+                                    (Oct to Dec)</span></td>
+                            <td class="sku-name">Winter Hedging</td>
+                            <td class="text-secondary">Procurement: ₹5.35 → ₹4.80</td>
+                            <td class="right margin-positive"><strong>+ ₹4.20 Cr</strong></td>
+                        </tr>
+                        <tr>
+                            <td><span class="quarter-badge"
+                                    style="font-size: 0.58rem; background: var(--accent-purple-dim); color: var(--accent-purple); border: 1px solid rgba(139,92,246,0.3);">Q4
+                                    (Jan to Mar)</span></td>
+                            <td class="sku-name">Ad Tech (Day Parting)</td>
+                            <td class="text-secondary">Fill Rate: 15% → 25%</td>
+                            <td class="right margin-positive"><strong>+ ₹12.00 Cr</strong></td>
+                        </tr>
+                        <tr class="pnl-total">
+                            <td><strong>TOTAL</strong></td>
+                            <td><strong>FY26 STRATEGY</strong></td>
+                            <td><strong>Net EBITDA Growth</strong></td>
+                            <td class="right"><strong>+ ₹24.50 Cr</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-muted mt-lg font-mono text-center" style="letter-spacing: 1px;">TABLE: FY26 PROFIT
+                GROWTH ROADMAP | Projected EBITDA Expansion by Quarter</p>
+
+            <!-- Winter Spike Data Block -->
+            <div class="callout red mt-lg fade-in">
+                <div class="callout-title text-red">The Q3 Winter Spike: Why Forward Contracts Matter</div>
+                <p><strong>Phenomenon:</strong> Supply drops in cold weather (hens lay fewer eggs). Demand rises as
+                    consumers seek caloric heat. Delhi NCR prices surge 25% to 50% in Dec/Jan.
+                    <strong>Strategy:</strong> Execute Forward Buying Contracts in September to lock Q3 rates at
+                    ₹4.80/egg vs anticipated spot of ₹5.35/egg. Demand remains relatively inelastic; consumers downgrade
+                    pack size (30 → 10) but do not stop buying.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTOR 6: COMPETITIVE BENCHMARKING
+         Blinkit vs Zepto vs Swiggy Instamart
+         ============================================================ -->
+    <section id="competitive">
+        <div class="container">
+            <div class="sector-tag purple">SECTOR 6: COMPETITIVE INTELLIGENCE</div>
+            <h2 class="sector-title">Competitive Benchmarking</h2>
+            <p class="sector-subtitle">Price variance analysis across the quick commerce triopoly (Delhi NCR, February
+                2026). The market is in tight equilibrium; algorithmic pricing keeps variance under 2% on commodity
+                SKUs.</p>
+
+            <div class="table-wrap fade-in mb-lg">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SKU / Product Type</th>
+                            <th class="right">Blinkit (Delhi)</th>
+                            <th class="right">Zepto (Delhi)</th>
+                            <th class="right">Swiggy Instamart</th>
+                            <th>Analysis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="sku-name">Commodity White (30 Pack)</td>
+                            <td class="right">₹228</td>
+                            <td class="right">₹230</td>
+                            <td class="right">₹232</td>
+                            <td class="text-secondary text-sm">Parity: Algorithmic matching keeps variance under 2%</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Premium White (6 Pack)</td>
+                            <td class="right">₹75 (Eggoz)</td>
+                            <td class="right margin-positive">₹69 (Relish)</td>
+                            <td class="right">₹76 (UPF)</td>
+                            <td class="text-secondary text-sm">Zepto undercuts via private label "Relish"</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Brown / Free Range (6 Pack)</td>
+                            <td class="right margin-negative">₹143</td>
+                            <td class="right margin-positive">₹127</td>
+                            <td class="right margin-positive">₹127</td>
+                            <td class="text-secondary text-sm">Blinkit commands a premium on niche SKUs</td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Delivery Fee (Orders under ₹100)</td>
+                            <td class="right">₹15 to ₹35</td>
+                            <td class="right">₹15 to ₹35</td>
+                            <td class="right">₹15 to ₹35</td>
+                            <td class="text-secondary text-sm">Barrier: High fees discourage single pack purchases</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid-3 fade-in">
+                <div class="callout blue">
+                    <div class="callout-title text-blue">Zepto: Private Label Attack</div>
+                    <p>Zepto uses in house brand "Relish" to offer lowest price point (₹69 for 6 eggs). Prioritizing
+                        category capture over margin. Operational headache of managing own supply chain.</p>
+                </div>
+                <div class="callout">
+                    <div class="callout-title text-green">Blinkit: Marketplace Defense</div>
+                    <p>Blinkit avoids private label in 2026. Partners with Eggoz/Henfruit instead. Higher shelf price
+                        (₹75) but earns net margin through ad revenue from brand partners. Less operational risk.</p>
+                </div>
+                <div class="callout amber">
+                    <div class="callout-title text-amber">BigBasket: "Stockout" Strategy</div>
+                    <p>BB Now attempts disruption with deep discounting (₹60 for 6 eggs). However, these SKUs frequently
+                        show "Out of Stock" indicating an operationally unsustainable loss leader strategy.</p>
+                </div>
+            </div>
+
+            <!-- TABLE: MARGIN SENSITIVITY ANALYSIS -->
+            <div class="table-wrap mt-xl fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">Season</th>
+                            <th class="right" style="width: 16%;">NECC Rate (₹)</th>
+                            <th class="right" style="width: 16%;">Landed Cost (₹)</th>
+                            <th class="right" style="width: 16%;">Selling Price (₹)</th>
+                            <th class="right" style="width: 16%;">Gross Margin %</th>
+                            <th style="width: 16%;">Verdict</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="sku-name">Summer (Low)</td>
+                            <td class="right">₹4.20</td>
+                            <td class="right">₹4.63</td>
+                            <td class="right">₹6.50</td>
+                            <td class="right margin-positive"><strong>28.7%</strong></td>
+                            <td class="margin-positive">🟢 <strong>Cash Cow</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="sku-name">Monsoon (Avg)</td>
+                            <td class="right">₹4.75</td>
+                            <td class="right">₹5.18</td>
+                            <td class="right">₹6.50</td>
+                            <td class="right text-amber"><strong>20.3%</strong></td>
+                            <td class="text-amber">🟡 <strong>Stable</strong></td>
+                        </tr>
+                        <tr style="background: var(--loss-red-dim);">
+                            <td class="sku-name" style="color: var(--loss-red);">Winter (Peak)</td>
+                            <td class="right margin-negative"><strong>₹5.35</strong></td>
+                            <td class="right margin-negative"><strong>₹5.78</strong></td>
+                            <td class="right"><strong>₹6.50</strong></td>
+                            <td class="right margin-negative"><strong>11.0%</strong></td>
+                            <td class="margin-negative">🔴 <strong>Critical</strong></td>
+                        </tr>
+                        <tr style="background: var(--profit-green-dim);">
+                            <td class="sku-name" style="color: var(--profit-green);">Winter (Hedged)</td>
+                            <td class="right margin-positive"><strong>₹4.80</strong></td>
+                            <td class="right margin-positive"><strong>₹5.23</strong></td>
+                            <td class="right"><strong>₹6.50</strong></td>
+                            <td class="right margin-positive"><strong>19.5%</strong></td>
+                            <td class="margin-positive">🟢 <strong>Protected</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-muted mt-lg font-mono text-center" style="letter-spacing: 1px;">TABLE: MARGIN
+                SENSITIVITY ANALYSIS | Impact of Winter Wholesale Rates on White Egg Margins</p>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SECTOR 7: CONSUMER & MARKET ANALYSIS
+         Demographics, Basket Analysis, Market Size
+         ============================================================ -->
+    <section id="consumer">
+        <div class="container">
+            <div class="sector-tag amber">SECTOR 7: CONSUMER & MARKET FORENSICS</div>
+            <h2 class="sector-title">Consumer & Market Analysis</h2>
+            <p class="sector-subtitle">Understanding who buys eggs on Blinkit and why. The demand profile goes far
+                beyond simple caloric consumption; it includes health conscious demographics, basket synergies, and
+                seasonal behavior.</p>
+
+            <div class="grid-3 fade-in mb-xl">
+                <div class="data-block">
+                    <div class="data-block-title">The "Eggetarian" Demographic</div>
+                    <div class="data-row"><span class="key">Vegetarians in North India</span><span class="val">30% to
+                            40%</span></div>
+                    <div class="data-row"><span class="key">"Eggetarian" Subset</span><span class="val">9% to 10% of
+                            population</span></div>
+                    <div class="data-row"><span class="key">Protein Deficient Diets</span><span class="val red">60% to
+                            84% in Delhi</span></div>
+                    <div class="data-row"><span class="key">Preference</span><span class="val">Branded, "odorless"
+                            eggs</span></div>
+                    <div class="data-row"><span class="key">Price Sensitivity</span><span class="val green">Low (vs
+                            commodity buyers)</span></div>
+                    <div class="data-conclusion">This demographic prefers packaged, branded eggs (Eggoz, Henfruit) that
+                        promise "herbal" feed inputs. They are less price sensitive than bulk commodity buyers.</div>
                 </div>
 
-                <div class="data-block fade-in">
-                    <div class="data-block-title">The Advertising Subsidy</div>
-                    <div class="data-row"><span class="key">Delivery Cost</span><span class="val red">₹30.00 per order</span></div>
-                    <div class="data-row"><span class="key">Avg Category Margin</span><span class="val">₹25.00 per order</span></div>
-                    <div class="data-row"><span class="key">Net Loss (Trading)</span><span class="val red">₹5.00 Loss per order</span></div>
-                    <div class="data-row"><span class="key">Ad Revenue (Avg)</span><span class="val green">₹15.00 per order</span></div>
-                    <div class="data-row"><span class="key">Final Profit</span><span class="val green">₹10.00 Profit per order</span></div>
-                    <div class="data-conclusion">We do not sell eggs. We sell the customer attention to Eggoz and Henfruit.</div>
+                <div class="data-block">
+                    <div class="data-block-title">Basket Analysis: Cross Selling</div>
+                    <div class="data-row"><span class="key">Breakfast Basket</span><span class="val">Eggs + Bread +
+                            Butter + Milk</span></div>
+                    <div class="data-row"><span class="key">Confidence Level</span><span
+                            class="val green">&gt;60%</span></div>
+                    <div class="data-row"><span class="key">Lift Score</span><span class="val green">&gt;1.25x</span>
+                    </div>
+                    <div class="data-row"><span class="key">"Gym Bro" Basket</span><span class="val">30 Pack + Chicken +
+                            Whey</span></div>
+                    <div class="data-row"><span class="key">Gym Basket AOV</span><span
+                            class="val green">&gt;₹1,500</span></div>
+                    <div class="data-conclusion">Blinkit checkout algorithm pushes complementary items (Boiled Egg
+                        Masala, Garlic Bread) converting commodity purchases into value added transactions.</div>
                 </div>
 
-                <div class="data-block fade-in">
-                    <div class="data-block-title">Q3 Winter Spike</div>
-                    <div class="data-row"><span class="key">Phenomenon</span><span class="val">Supply drops in cold (hens lay less). Demand rises for caloric heat.</span></div>
-                    <div class="data-row"><span class="key">Price Delta</span><span class="val red">25% surge in procurement cost</span></div>
-                    <div class="data-row"><span class="key">Strategy</span><span class="val green">Forward Buying Contracts executed in September to lock Q3 rates</span></div>
+                <div class="data-block">
+                    <div class="data-block-title">Dark Store Operations</div>
+                    <div class="data-row"><span class="key">Egg Shelf Life</span><span class="val">~21 days</span></div>
+                    <div class="data-row"><span class="key">Target Inventory Turn</span><span class="val green">&lt;3
+                            days</span></div>
+                    <div class="data-row"><span class="key">AI Forecasting Target</span><span class="val">&lt;2%
+                            wastage</span></div>
+                    <div class="data-row"><span class="key">Stock Rotation</span><span class="val">FIFO (handheld
+                            terminals)</span></div>
+                    <div class="data-row"><span class="key">Space Efficiency Issue</span><span class="val red">30 eggs =
+                            5 smartphones volume</span></div>
+                    <div class="data-conclusion">Eggs are an inefficient use of dark store space (₹228 per 30 pack vs
+                        ₹3L for 5 iPhones in same volume). Tolerated only as high frequency traffic drivers.</div>
+                </div>
+            </div>
+
+            <!-- Macro Context -->
+            <div class="grid-2 fade-in">
+                <div class="callout blue">
+                    <div class="callout-title text-blue">1P Model Shift (FY26)</div>
+                    <p><strong>Before:</strong> Marketplace model. 6 eggs sell for ₹100 → Blinkit recognizes ₹15 as
+                        commission.<br><strong>After:</strong> Inventory led (1P) model. Blinkit recognizes full ₹100 as
+                        revenue. Revenue up 172% YoY optically. But Blinkit now owns the inventory risk: breakage,
+                        expiry, and shrinkage hit COGS directly.</p>
+                </div>
+                <div class="callout red">
+                    <div class="callout-title text-red">Regulatory Risks (AQI / GRAP)</div>
+                    <p><strong>Construction Bans:</strong> GRAP Stage IV restrictions blocked new dark store fit outs
+                        during peak winter season. <strong>Logistics:</strong> BS IV diesel vehicle restrictions
+                        disrupted mid mile supply chain. Forced shift to CNG/EV fleets with reduced payload capacity.
+                        <strong>Impact:</strong> Contributed to missing the 2,100 store target (actual: 2,027).
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== SECTOR 4: THE FORENSIC P&L SIMULATOR ===== -->
+    <!-- ============================================================
+         SECTOR 8: P&L SIMULATOR (THE ENGINE)
+         Interactive Calculator
+         ============================================================ -->
     <section id="simulator">
         <div class="container">
-            <div class="sector-tag">SECTOR 4</div>
-            <h2 class="sector-title">The Forensic P&L Simulator</h2>
-            <p class="sector-subtitle">Play "CEO" with the numbers. Adjust the sliders below to stress test the business model and see how EBITDA responds in real time.</p>
+            <div class="sector-tag">SECTOR 8: THE FORENSIC P&L SIMULATOR</div>
+            <h2 class="sector-title">Play "CEO" With The Numbers</h2>
+            <p class="sector-subtitle">Stress test the business model. Adjust daily orders, ad penetration, and wastage
+                rate to see how EBITDA responds in real time. All calculations validated against Python engine
+                (validate.py).</p>
 
-            <div class="simulator-grid">
+            <div class="callout mb-lg fade-in">
+                <div class="callout-title text-green">Calculation Transparency</div>
+                <p><strong>Formula:</strong> EBITDA = (GMV × Blended Margin) + (GMV × Ad Rate) − (GMV × Wastage Rate) −
+                    (Daily Orders × ₹30 × 365). <strong>Blended Margin:</strong> 19.80% (White 70% × 15% + Protein 20% ×
+                    30% + Brown 10% × 33%). <strong>AOV:</strong> ₹150. All constants cross validated with validate.py
+                    output.</p>
+            </div>
+
+            <div class="grid-2">
                 <!-- Input Panel -->
                 <div class="sim-panel fade-in">
                     <div class="sim-panel-title">Input Parameters</div>
@@ -959,6 +910,13 @@
                         </div>
                         <input type="range" id="wastageSlider" min="0.5" max="10" value="2" step="0.1">
                     </div>
+
+                    <div class="math-block" style="margin-top: 8px;">
+                        <strong>Constants (Locked):</strong><br>
+                        AOV = ₹150 | Blended Margin = 19.80%<br>
+                        Delivery Cost = ₹30/order<br>
+                        White 70% × 15% + Protein 20% × 30% + Brown 10% × 33%
+                    </div>
                 </div>
 
                 <!-- Output Panel -->
@@ -968,28 +926,33 @@
                     <div class="output-grid">
                         <div class="output-card">
                             <div class="output-label">Total GMV</div>
-                            <div class="output-value" id="outGMV">₹0</div>
-                            <div class="output-sub">Orders × AOV × 365</div>
+                            <div class="output-value text-blue" id="outGMV">₹0</div>
+                            <div class="output-sub">Orders × ₹150 × 365</div>
+                        </div>
+                        <div class="output-card">
+                            <div class="output-label">Gross Profit</div>
+                            <div class="output-value text-green" id="outGrossProfit">₹0</div>
+                            <div class="output-sub">GMV × 19.80%</div>
                         </div>
                         <div class="output-card">
                             <div class="output-label">Ad Revenue</div>
-                            <div class="output-value" id="outAdRev">₹0</div>
+                            <div class="output-value text-green" id="outAdRev">₹0</div>
                             <div class="output-sub">GMV × Ad Penetration</div>
                         </div>
                         <div class="output-card">
                             <div class="output-label">Wastage Loss</div>
-                            <div class="output-value" id="outWaste">₹0</div>
+                            <div class="output-value text-red" id="outWaste">₹0</div>
                             <div class="output-sub">GMV × Wastage Rate</div>
                         </div>
                         <div class="output-card">
                             <div class="output-label">Logistics Cost</div>
-                            <div class="output-value" id="outLogistics">₹0</div>
+                            <div class="output-value text-amber" id="outLogistics">₹0</div>
                             <div class="output-sub">Orders × ₹30 × 365</div>
                         </div>
-                        <div class="output-card" id="ebitdaCard">
+                        <div class="output-card full-width" id="ebitdaCard">
                             <div class="output-label">FINAL EBITDA</div>
                             <div class="output-value" id="outEBITDA">₹0</div>
-                            <div class="output-sub" id="ebitdaSub">Gross Margin + Ad Revenue − Wastage − Logistics</div>
+                            <div class="output-sub" id="ebitdaMarginPct">0% of GMV</div>
                         </div>
                     </div>
                 </div>
@@ -997,290 +960,96 @@
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- ============================================================
+         SECTOR 9: RISK ASSESSMENT & STRATEGIC OUTLOOK
+         ============================================================ -->
+    <section id="risks">
+        <div class="container">
+            <div class="sector-tag purple">SECTOR 9: RISK ASSESSMENT & OUTLOOK</div>
+            <h2 class="sector-title">Vulnerabilities & Strategic Recommendations</h2>
+            <p class="sector-subtitle">The category has successfully transitioned from a loss leader to a profit
+                generator. But profitability is structurally dependent on advertising revenue and basket cross selling.
+                Below are the key risks and mitigations.</p>
+
+            <div class="grid-3 fade-in mb-xl">
+                <!-- Risk Cards -->
+                <div class="data-block">
+                    <div class="data-block-title" style="color: var(--loss-red);">Supply Chain Fragility</div>
+                    <div class="data-row"><span class="key">Single Point of Failure</span><span class="val red">Barwala
+                            Corridor</span></div>
+                    <div class="data-row"><span class="key">Bird Flu Risk</span><span class="val red">Localized outbreak
+                            = supply collapse</span></div>
+                    <div class="data-row"><span class="key">Highway Blockades</span><span class="val red">Farmer
+                            protests (periodic)</span></div>
+                    <div class="data-row"><span class="key">Fallback Cost</span><span class="val red">Forced retail rate
+                            procurement</span></div>
+                    <div class="data-conclusion"
+                        style="background: var(--loss-red-dim); border-color: rgba(239, 68, 68, 0.2); color: var(--loss-red);">
+                        Mitigation: Diversify sourcing beyond Barwala. Develop secondary hub in Uttar Pradesh or
+                        Rajasthan.</div>
+                </div>
+
+                <div class="data-block">
+                    <div class="data-block-title" style="color: var(--loss-red);">Regulatory Risk</div>
+                    <div class="data-row"><span class="key">Social Security Code</span><span class="val red">+5% to 10%
+                            delivery cost</span></div>
+                    <div class="data-row"><span class="key">GRAP Restrictions</span><span class="val red">Construction +
+                            logistics bans</span></div>
+                    <div class="data-row"><span class="key">Store Target Miss</span><span class="val amber">2,027 vs
+                            2,100 target</span></div>
+                    <div class="data-row"><span class="key">Impact on Eggs</span><span class="val red">Could turn Op.
+                            Contribution negative</span></div>
+                    <div class="data-conclusion"
+                        style="background: var(--loss-red-dim); border-color: rgba(239, 68, 68, 0.2); color: var(--loss-red);">
+                        In a 1% operational margin category, even a 5% delivery cost increase is existential without ad
+                        revenue offset.</div>
+                </div>
+
+                <div class="data-block">
+                    <div class="data-block-title" style="color: var(--profit-green);">Strategic Recommendations</div>
+                    <div class="data-row"><span class="key">Supply Diversification</span><span class="val green">UP /
+                            Rajasthan secondary hub</span></div>
+                    <div class="data-row"><span class="key">Ad Tech Optimization</span><span class="val green">Day
+                            Parting (6AM to 9AM slots)</span></div>
+                    <div class="data-row"><span class="key">Private Label Re Entry</span><span class="val green">At
+                            3,000 stores density</span></div>
+                    <div class="data-row"><span class="key">Target Volume for PL</span><span class="val green">Justifies
+                            dedicated packing line</span></div>
+                    <div class="data-conclusion">Re introduction of a "Control Brand" (like evolving "The Egg Co." into
+                        a full PL) is inevitable once store density hits 3,000. This captures the manufacturing margin
+                        currently ceded to Zepto's Relish.</div>
+                </div>
+            </div>
+
+            <!-- Final Conclusion -->
+            <div class="callout fade-in"
+                style="border-left-color: var(--accent-purple); text-align: center; padding: 30px;">
+                <div class="callout-title text-purple" style="font-size: 0.8rem; letter-spacing: 3px;">FINAL FORENSIC
+                    CONCLUSION</div>
+                <p
+                    style="font-size: 1rem; color: var(--text-primary); max-width: 800px; margin: 0 auto; line-height: 1.8;">
+                    The egg itself is merely the hook; the profit is in the ecosystem it activates. As Blinkit pushes
+                    towards 3,000 stores, the ability to manage the "physics" of the egg (breakage, spoilage, logistics)
+                    while maximizing the "economics" of the user (ads, fees, retention) will define the category's
+                    future. The category contributes ₹108.22 Crores in EBITDA, with 95% of that profit coming from
+                    advertising and platform fees rather than trading margin.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
     <footer>
         <div class="container">
-            <p>PROJECT YOLK ALPHA | FORENSIC AUDIT | DELHI NCR EGG CATEGORY 2025 2026</p>
+            <p>PROJECT YOLK ALPHA | FORENSIC AUDIT | BLINKIT EGG CATEGORY | DELHI NCR 2025 2026</p>
+            <p style="margin-top: 8px; font-size: 0.62rem;">All calculations validated via Python engine (validate.py).
+                Data sourced from NECC, Blinkit filings, and industry research.</p>
         </div>
     </footer>
 
-    <!-- ===== JAVASCRIPT ENGINE ===== -->
-    <script>
-        // =============================================
-        // TICKER TAPE
-        // =============================================
-        function buildTicker() {
-            const items = [
-                { label: 'NECC Barwala Rate', value: '₹475/100', cls: '' },
-                { label: 'Delhi Wholesale', value: '₹510/100', cls: '' },
-                { label: 'Arbitrage Spread', value: '+₹0.15/egg', cls: '' },
-                { label: 'Breakage Rate', value: '4.0%', cls: 'red' },
-                { label: 'Dark Stores Live', value: '2,027', cls: '' },
-                { label: 'Market Share', value: '45%', cls: '' },
-                { label: 'Category GMV', value: '₹547.5 Cr', cls: '' },
-                { label: 'Ad Fill Rate', value: '15%', cls: '' },
-                { label: 'Net EBITDA', value: '₹104.02 Cr', cls: '' },
-                { label: 'AOV', value: '₹150', cls: '' },
-                { label: 'Landed Cost', value: '₹5.18/egg', cls: '' },
-                { label: 'Winter Spike', value: '+25%', cls: 'red' }
-            ];
-            const ticker = document.getElementById('ticker');
-            // Double the items for seamless loop
-            const allItems = [...items, ...items];
-            ticker.innerHTML = allItems.map(it =>
-                `<span class="ticker-item">
-                    <span class="dot"></span>
-                    <span class="label">${it.label}</span>
-                    <span class="value ${it.cls}">${it.value}</span>
-                </span>`
-            ).join('');
-        }
-        buildTicker();
-
-        // =============================================
-        // SKU MATRIX DATA & RENDERING
-        // =============================================
-        const SKU_DATA = [
-            { name: 'White Eggs (6 Pack)', pack: '6 Pack', price: 50, margin: 0.15, volume: 0.20 },
-            { name: 'White Eggs (10 Pack)', pack: '10 Pack', price: 85, margin: 0.15, volume: 0.25 },
-            { name: 'White Eggs (30 Pack)', pack: '30 Pack', price: 228, margin: 0.15, volume: 0.25 },
-            { name: 'Protein Eggs (6 Pack)', pack: '6 Pack', price: 80, margin: 0.30, volume: 0.06 },
-            { name: 'Protein Eggs (10 Pack)', pack: '10 Pack', price: 130, margin: 0.30, volume: 0.08 },
-            { name: 'Protein Eggs (30 Pack)', pack: '30 Pack', price: 350, margin: 0.30, volume: 0.06 },
-            { name: 'Brown Eggs (6 Pack)', pack: '6 Pack', price: 70, margin: 0.33, volume: 0.04 },
-            { name: 'Brown Eggs (10 Pack)', pack: '10 Pack', price: 110, margin: 0.33, volume: 0.03 },
-            { name: 'Brown Eggs (30 Pack)', pack: '30 Pack', price: 300, margin: 0.33, volume: 0.03 }
-        ];
-
-        const DELIVERY_COST = 30;
-        const AD_REVENUE = 15;
-        const MONTHLY_ORDERS = 100000;
-
-        function renderSKUTable(reality) {
-            const body = document.getElementById('skuBody');
-            const marginHeader = document.getElementById('marginHeader');
-            const profitHeader = document.getElementById('profitHeader');
-            const toggleStatus = document.getElementById('toggleStatus');
-
-            if (reality) {
-                marginHeader.textContent = 'TRUE NET MARGIN';
-                profitHeader.textContent = 'NET PROFIT';
-                toggleStatus.textContent = 'TRUE NET MARGIN VIEW';
-                toggleStatus.className = 'toggle-status on';
-            } else {
-                marginHeader.textContent = 'MARGIN %';
-                profitHeader.textContent = 'GROSS PROFIT';
-                toggleStatus.textContent = 'GROSS MARGIN VIEW';
-                toggleStatus.className = 'toggle-status off';
-            }
-
-            body.innerHTML = SKU_DATA.map(sku => {
-                const grossProfit = sku.price * sku.margin;
-                let displayMargin, displayProfit;
-
-                if (reality) {
-                    displayProfit = grossProfit - DELIVERY_COST + AD_REVENUE;
-                    displayMargin = displayProfit / sku.price;
-                } else {
-                    displayProfit = grossProfit;
-                    displayMargin = sku.margin;
-                }
-
-                const orders = Math.round(MONTHLY_ORDERS * sku.volume);
-                const contribution = displayProfit * orders;
-                const isNeg = displayMargin < 0;
-                const marginClass = isNeg ? 'margin-negative' : 'margin-positive';
-                const barColor = isNeg ? 'var(--loss-red)' : 'var(--profit-green)';
-                const barHeight = Math.min(Math.abs(displayMargin) * 100, 40);
-
-                return `<tr>
-                    <td class="sku-name">${sku.name}</td>
-                    <td>${sku.pack}</td>
-                    <td>₹${sku.price}</td>
-                    <td class="margin-cell">
-                        <span class="margin-bar" style="height:${barHeight}px;background:${barColor}"></span>
-                        <span class="${marginClass}">${(displayMargin * 100).toFixed(1)}%</span>
-                    </td>
-                    <td class="${marginClass}">₹${displayProfit.toFixed(2)}</td>
-                    <td class="${isNeg ? 'margin-negative' : ''}">₹${formatNum(contribution)}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        document.getElementById('realityToggle').addEventListener('change', function() {
-            renderSKUTable(this.checked);
-        });
-        renderSKUTable(false);
-
-        // =============================================
-        // EBITDA BRIDGE CHART (Chart.js Waterfall)
-        // =============================================
-        function buildChart() {
-            const ctx = document.getElementById('ebidtaChart').getContext('2d');
-            const labels = ['Current Profit', 'Q1: Supply Fix', 'Q2: Mix Shift', 'Q3: Winter Hedge', 'Q4: Ad Engine', 'Target EBITDA'];
-            const base = 83.72; // Starting EBITDA in Cr
-            const q1 = 2.5;
-            const q2 = 5.8;
-            const q3 = 0; // Protection, not direct addition
-            const q4 = 12;
-            const target = base + q1 + q2 + q3 + q4; // ~104.02
-
-            // Waterfall: hidden base + visible increments
-            const hidden  = [0, base, base + q1, base + q1 + q2, base + q1 + q2 + q3, 0];
-            const visible = [base, q1, q2, 0, q4, target];
-            const colors  = ['#3B82F6', '#10B981', '#10B981', '#F59E0B', '#8B5CF6', '#10B981'];
-            const borderColors = colors.map(c => c);
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Base',
-                            data: hidden,
-                            backgroundColor: 'transparent',
-                            borderColor: 'transparent',
-                            borderSkipped: false,
-                            barPercentage: 0.5
-                        },
-                        {
-                            label: 'Value',
-                            data: visible,
-                            backgroundColor: colors.map(c => c + '33'),
-                            borderColor: borderColors,
-                            borderWidth: 2,
-                            borderRadius: 6,
-                            borderSkipped: false,
-                            barPercentage: 0.5
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    if (ctx.datasetIndex === 0) return null;
-                                    return '₹' + ctx.raw.toFixed(2) + ' Cr';
-                                }
-                            },
-                            backgroundColor: '#1E293B',
-                            titleColor: '#F1F5F9',
-                            bodyColor: '#F1F5F9',
-                            borderColor: 'rgba(148,163,184,0.2)',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            padding: 12
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true,
-                            grid: { display: false },
-                            ticks: {
-                                color: '#94A3B8',
-                                font: { family: "'JetBrains Mono'", size: 10, weight: 600 },
-                                maxRotation: 30
-                            }
-                        },
-                        y: {
-                            stacked: true,
-                            grid: { color: 'rgba(148,163,184,0.06)' },
-                            ticks: {
-                                color: '#64748B',
-                                font: { family: "'JetBrains Mono'", size: 10 },
-                                callback: v => '₹' + v + ' Cr'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        buildChart();
-
-        // =============================================
-        // P&L SIMULATOR ENGINE
-        // =============================================
-        const marginWhite = 0.15;
-        const marginProtein = 0.30;
-        const marginBrown = 0.33;
-        let shareWhite = 0.70;
-        let shareProtein = 0.20;
-        let shareBrown = 0.10;
-        const blendedMargin = (shareWhite * marginWhite) + (shareProtein * marginProtein) + (shareBrown * marginBrown);
-        const AOV = 150;
-        const deliveryCostPerOrder = 30;
-
-        function calculateEBITDA(dailyOrders, adRate, wastageRate) {
-            const totalRevenue = dailyOrders * AOV * 365;
-            const grossProfit = totalRevenue * blendedMargin;
-            const adIncome = totalRevenue * (adRate / 100);
-            const wastageLoss = totalRevenue * (wastageRate / 100);
-            const logisticsCost = dailyOrders * deliveryCostPerOrder * 365;
-            return { totalRevenue, grossProfit, adIncome, wastageLoss, logisticsCost,
-                     ebitda: grossProfit + adIncome - wastageLoss - logisticsCost };
-        }
-
-        function formatCr(val) {
-            const cr = val / 10000000;
-            if (Math.abs(cr) >= 1) return '₹' + cr.toFixed(2) + ' Cr';
-            const lakh = val / 100000;
-            return '₹' + lakh.toFixed(2) + ' L';
-        }
-
-        function formatNum(val) {
-            if (Math.abs(val) >= 10000000) return (val / 10000000).toFixed(2) + ' Cr';
-            if (Math.abs(val) >= 100000) return (val / 100000).toFixed(2) + ' L';
-            return val.toLocaleString('en-IN', { maximumFractionDigits: 0 });
-        }
-
-        function updateSimulator() {
-            const dailyOrders = parseInt(document.getElementById('ordersSlider').value);
-            const adRate = parseFloat(document.getElementById('adSlider').value);
-            const wastageRate = parseFloat(document.getElementById('wastageSlider').value);
-
-            // Update display values
-            document.getElementById('ordersVal').textContent = dailyOrders.toLocaleString('en-IN');
-            document.getElementById('adVal').textContent = adRate + '%';
-            document.getElementById('wastageVal').textContent = wastageRate + '%';
-
-            const result = calculateEBITDA(dailyOrders, adRate, wastageRate);
-
-            document.getElementById('outGMV').textContent = formatCr(result.totalRevenue);
-            document.getElementById('outAdRev').textContent = formatCr(result.adIncome);
-            document.getElementById('outWaste').textContent = formatCr(result.wastageLoss);
-            document.getElementById('outLogistics').textContent = formatCr(result.logisticsCost);
-            document.getElementById('outEBITDA').textContent = formatCr(result.ebitda);
-
-            const ebitdaCard = document.getElementById('ebitdaCard');
-            if (result.ebitda >= 0) {
-                ebitdaCard.className = 'output-card ebitda-positive';
-            } else {
-                ebitdaCard.className = 'output-card ebitda-negative';
-            }
-        }
-
-        document.getElementById('ordersSlider').addEventListener('input', updateSimulator);
-        document.getElementById('adSlider').addEventListener('input', updateSimulator);
-        document.getElementById('wastageSlider').addEventListener('input', updateSimulator);
-        updateSimulator();
-
-        // =============================================
-        // SCROLL FADE IN OBSERVER
-        // =============================================
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-    </script>
+    <!-- JS Engine (separate file) -->
+    <script src="js/engine.js"></script>
 </body>
+
 </html>
